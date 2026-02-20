@@ -15,6 +15,7 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -56,6 +57,12 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
     const newSet = new Set(expandedCategories);
     if (newSet.has(id)) newSet.delete(id); else newSet.add(id);
     setExpandedCategories(newSet);
+  };
+
+  const toggleTaskExpansion = (id: string) => {
+    const newSet = new Set(expandedTasks);
+    if (newSet.has(id)) newSet.delete(id); else newSet.add(id);
+    setExpandedTasks(newSet);
   };
 
   const onDragStart = (id: string) => setDraggedTaskId(id);
@@ -128,30 +135,19 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
               <ul className="space-y-3 ps-2 mb-4 animate-in slide-in-from-top-2 duration-300">
                 {catTasks.map((task) => {
                   const taskColor = task.color || cat.color;
-                  const iconBg = task.isArchived ? '#cbd5e1' : taskColor;
-                  // Handle legacy icons that might be Lucide component names by falling back to a default emoji
-                  const isEmoji = task.icon && task.icon.length <= 4; 
-                  const displayIcon = isEmoji ? task.icon : '📝';
+                  const isExpanded = expandedTasks.has(task.id);
 
                   return (
                     <li
                       key={task.id}
                       draggable={!showArchived}
                       onDragStart={() => onDragStart(task.id)}
-                      className={`group flex items-center justify-between p-4 bg-white/95 backdrop-blur-sm border border-gray-100 rounded-[1.5rem] shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all relative ${!showArchived ? 'cursor-move' : ''}`}
+                      onClick={() => toggleTaskExpansion(task.id)}
+                      className={`group flex flex-col p-4 bg-white/95 backdrop-blur-sm border border-gray-100 rounded-[1.5rem] shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all relative cursor-pointer ${!showArchived ? '' : ''}`}
                     >
-                      <div className="flex items-center gap-4 truncate">
-                        <div 
-                          className="flex items-center justify-center w-12 h-12 rounded-2xl shadow-lg transition-all duration-300 transform group-hover:scale-110 group-hover:rotate-3 text-2xl" 
-                          style={{ 
-                            backgroundColor: iconBg, 
-                            boxShadow: task.isArchived ? 'none' : `0 8px 16px -4px ${taskColor}40`
-                          }}
-                        >
-                          {displayIcon}
-                        </div>
-                        <div className="truncate">
-                          <p className={`font-bold text-lg truncate leading-tight ${task.isArchived ? 'line-through text-gray-400' : 'text-slate-800'}`}>
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-grow">
+                          <p className={`font-bold text-lg leading-tight break-words ${task.isArchived ? 'line-through text-gray-400' : 'text-slate-800'}`}>
                             {task.title}
                           </p>
                           {task.deadline && (
@@ -161,30 +157,44 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
                             </p>
                           )}
                         </div>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <Lucide.ChevronDown 
+                            size={18} 
+                            className={`text-slate-300 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
+                          />
+                          <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
+                            <button 
+                              onClick={(e) => handleEditClick(e, task)} 
+                              className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all"
+                              title="עריכת משימה"
+                            >
+                              <Lucide.Edit2 size={18} />
+                            </button>
+                            <button 
+                              onClick={(e) => toggleArchive(e, task.id, task.isArchived)} 
+                              className="p-2 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all"
+                              title={task.isArchived ? "שחזור משימה" : "סימון כבוצע"}
+                            >
+                              {task.isArchived ? <Lucide.RotateCcw size={18} /> : <Lucide.CheckCircle2 size={18} />}
+                            </button>
+                            <button 
+                              onClick={(e) => deleteTask(e, task.id)} 
+                              className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                              title="מחיקה סופית"
+                            >
+                              <Lucide.Trash2 size={18} />
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0 pr-2">
-                        <button 
-                          onClick={(e) => handleEditClick(e, task)} 
-                          className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all"
-                          title="עריכת משימה"
-                        >
-                          <Lucide.Edit2 size={18} />
-                        </button>
-                        <button 
-                          onClick={(e) => toggleArchive(e, task.id, task.isArchived)} 
-                          className="p-2 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all"
-                          title={task.isArchived ? "שחזור משימה" : "סימון כבוצע"}
-                        >
-                          {task.isArchived ? <Lucide.RotateCcw size={18} /> : <Lucide.CheckCircle2 size={18} />}
-                        </button>
-                        <button 
-                          onClick={(e) => deleteTask(e, task.id)} 
-                          className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
-                          title="מחיקה סופית"
-                        >
-                          <Lucide.Trash2 size={18} />
-                        </button>
-                      </div>
+                      
+                      {isExpanded && (
+                        <div className="mt-3 pt-3 border-t border-gray-100 animate-in fade-in slide-in-from-top-1 duration-200">
+                          <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap text-right">
+                            {task.description || 'אין תיאור למשימה זו.'}
+                          </p>
+                        </div>
+                      )}
                     </li>
                   );
                 })}

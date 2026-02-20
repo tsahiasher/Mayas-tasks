@@ -1,20 +1,20 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# המשימות של מאיה 📓
 
-# Run and deploy your AI Studio app
+**המשימות של מאיה** היא אפליקציה חכמה, מעוצבת ואינטואיטיבית לניהול משימות אישיות. האפליקציה נבנתה בדגש על חווית משתמש נקייה (Minimalist UX) ותמיכה מלאה בעברית (RTL).
 
-This contains everything you need to run your app locally.
+![צילום מסך של האפליקציה](screenshot.png)
 
-View your app in AI Studio: https://ai.studio/apps/16726fac-d9e8-41b5-9564-cc93cb38f8bc
+## ✨ תכונות עיקריות
 
-## Run Locally
+- **ניהול קטגוריות חכם**: ארגון משימות לפי קטגוריות מותאמות אישית עם אייקונים וצבעים ייחודיים.
+- **ממשק מודרני**: עיצוב נקי עם אפקטים של טשטוש (Glassmorphism) ומעברים חלקים.
+- **התאמה אישית**: אפשרות לשינוי רקע האפליקציה לכל תמונה מהרשת.
+- **ארכיון משימות**: שמירה על סדר באמצעות העברת משימות שהושלמו לארכיון.
+- **סנכרון בזמן אמת**: עבודה מול Firebase לשמירה וסנכרון הנתונים מכל מכשיר.
 
-**Prerequisites:**  Node.js
+## 🛠 טכנולוגיות
 
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- **React 19** & **TypeScript**
+- **Tailwind CSS** לעיצוב מודרני ומהיר
+- **Firebase Firestore** למסד נתונים בזמן אמת
+- **Lucide React** לאייקונים מעוצבים

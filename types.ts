@@ -9,10 +9,10 @@ export interface Category {
 export interface Task {
   id: string;
   title: string;
+  description?: string;
   categoryId: string;
   deadline: string;
   color: string;
-  icon: string;
   createdAt: number;
   order: number;
   isArchived: boolean;

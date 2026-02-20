@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { collection, addDoc, updateDoc, doc, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { Category, Task } from '../types';
-import IconSelector from './IconSelector';
 import * as Lucide from 'lucide-react';
 
 const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#64748b', '#ec4899', '#0ea5e9', '#d946ef'];
@@ -16,21 +15,21 @@ interface Props {
 
 const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
   const [title, setTitle] = useState(initialTask?.title || '');
+  const [description, setDescription] = useState(initialTask?.description || '');
   const [selectedCategoryId, setSelectedCategoryId] = useState(initialTask?.categoryId || (categories.length > 0 ? categories[0].id : 'default'));
   const [newCategoryName, setNewCategoryName] = useState('');
   const [isNewCategoryMode, setIsNewCategoryMode] = useState(false);
   const [deadline, setDeadline] = useState(initialTask?.deadline || '');
   const [color, setColor] = useState(initialTask?.color || '#3b82f6');
-  const [icon, setIcon] = useState(initialTask?.icon || '✅');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (initialTask) {
       setTitle(initialTask.title);
+      setDescription(initialTask.description || '');
       setSelectedCategoryId(initialTask.categoryId);
       setDeadline(initialTask.deadline);
       setColor(initialTask.color);
-      setIcon(initialTask.icon);
     }
   }, [initialTask]);
 
@@ -60,10 +59,10 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
 
       const taskData = {
         title: title.trim(),
+        description: description.trim(),
         categoryId: categoryIdToUse || 'default',
         deadline,
         color,
-        icon,
         isArchived: initialTask?.isArchived || false,
         order: initialTask?.order || Date.now(),
         updatedAt: Date.now(),
@@ -89,7 +88,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label className="block text-sm font-bold text-slate-700 mb-2 text-right">תיאור המשימה</label>
+        <label className="block text-sm font-bold text-slate-700 mb-2 text-right">כותרת המשימה</label>
         <input
           type="text"
           value={title}
@@ -98,6 +97,18 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
           className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-right font-bold text-lg"
           disabled={isSubmitting}
           autoFocus
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-bold text-slate-700 mb-2 text-right">תיאור (אופציונלי)</label>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="פרטים נוספים..."
+          rows={3}
+          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-right text-sm resize-none"
+          disabled={isSubmitting}
         />
       </div>
 
@@ -156,7 +167,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
       </div>
 
       <div>
-        <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider text-right">בחר צבע עבור האייקון</label>
+        <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider text-right">בחר צבע עבור המשימה</label>
         <div className="flex flex-wrap gap-3 justify-end">
           {colors.map(c => (
             <button
@@ -168,11 +179,6 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
             />
           ))}
         </div>
-      </div>
-
-      <div>
-        <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider text-right">בחר אימוג'י</label>
-        <IconSelector selected={icon} onSelect={setIcon} color={color} />
       </div>
 
       <button
