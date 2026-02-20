@@ -78,6 +78,22 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
     setDraggedTaskId(null);
   };
 
+  const getTaskStatusColor = (deadline: string) => {
+    if (!deadline) return '#10b981'; // Green (No due date)
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueDate = new Date(deadline);
+    dueDate.setHours(0, 0, 0, 0);
+    
+    const diffTime = dueDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays >= 7) return '#10b981'; // Green
+    if (diffDays >= 4) return '#f59e0b'; // Yellow
+    return '#ef4444'; // Red (3 or less, or overdue)
+  };
+
   if (loading) return <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>;
 
   const groupedTasks = tasks.reduce((acc, task) => {
@@ -134,8 +150,8 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
             {isOpen && (
               <ul className="space-y-3 ps-2 mb-4 animate-in slide-in-from-top-2 duration-300">
                 {catTasks.map((task) => {
-                  const taskColor = task.color || cat.color;
                   const isExpanded = expandedTasks.has(task.id);
+                  const statusColor = getTaskStatusColor(task.deadline);
 
                   return (
                     <li
@@ -143,9 +159,15 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
                       draggable={!showArchived}
                       onDragStart={() => onDragStart(task.id)}
                       onClick={() => toggleTaskExpansion(task.id)}
-                      className={`group flex flex-col p-4 bg-white/95 backdrop-blur-sm border border-gray-100 rounded-[1.5rem] shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all relative cursor-pointer ${!showArchived ? '' : ''}`}
+                      className={`group flex flex-col p-4 bg-white/95 backdrop-blur-sm border border-gray-100 rounded-[1.5rem] shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all relative cursor-pointer overflow-hidden ${!showArchived ? '' : ''}`}
                     >
-                      <div className="flex items-start justify-between gap-4">
+                      {/* Status Line at Bottom */}
+                      <div 
+                        className="absolute bottom-0 left-0 right-0 h-1.5" 
+                        style={{ backgroundColor: statusColor }}
+                      />
+
+                      <div className="flex items-start justify-between gap-4 mb-1">
                         <div className="flex-grow">
                           <p className={`font-bold text-lg leading-tight break-words ${task.isArchived ? 'line-through text-gray-400' : 'text-slate-800'}`}>
                             {task.title}
@@ -189,7 +211,7 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
                       </div>
                       
                       {isExpanded && (
-                        <div className="mt-3 pt-3 border-t border-gray-100 animate-in fade-in slide-in-from-top-1 duration-200">
+                        <div className="mt-3 pt-3 border-t border-gray-100 animate-in fade-in slide-in-from-top-1 duration-200 pb-2">
                           <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap text-right">
                             {task.description || 'אין תיאור למשימה זו.'}
                           </p>

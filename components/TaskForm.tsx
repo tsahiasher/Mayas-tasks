@@ -20,7 +20,6 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
   const [newCategoryName, setNewCategoryName] = useState('');
   const [isNewCategoryMode, setIsNewCategoryMode] = useState(false);
   const [deadline, setDeadline] = useState(initialTask?.deadline || '');
-  const [color, setColor] = useState(initialTask?.color || '#3b82f6');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -29,7 +28,6 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
       setDescription(initialTask.description || '');
       setSelectedCategoryId(initialTask.categoryId);
       setDeadline(initialTask.deadline);
-      setColor(initialTask.color);
     }
   }, [initialTask]);
 
@@ -50,7 +48,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
         } else {
           const catRef = await addDoc(collection(db, 'categories'), {
             name: trimmedName,
-            color: color,
+            color: '#3b82f6', // Default color for new category
             order: categories.length
           });
           categoryIdToUse = catRef.id;
@@ -62,7 +60,6 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
         description: description.trim(),
         categoryId: categoryIdToUse || 'default',
         deadline,
-        color,
         isArchived: initialTask?.isArchived || false,
         order: initialTask?.order || Date.now(),
         updatedAt: Date.now(),
@@ -163,21 +160,6 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
             onChange={(e) => setDeadline(e.target.value)}
             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 font-medium"
           />
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider text-right">בחר צבע עבור המשימה</label>
-        <div className="flex flex-wrap gap-3 justify-end">
-          {colors.map(c => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => setColor(c)}
-              className={`w-10 h-10 rounded-full border-4 transition-all ${color === c ? 'scale-110 border-white ring-4 ring-slate-200 shadow-md' : 'border-transparent hover:scale-110 shadow-sm'}`}
-              style={{ backgroundColor: c }}
-            />
-          ))}
         </div>
       </div>
 
