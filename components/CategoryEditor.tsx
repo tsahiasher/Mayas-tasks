@@ -23,7 +23,7 @@ const CategoryRow: React.FC<{
   }, [cat.name]);
 
   return (
-    <div className="flex items-center gap-3 p-3 bg-white border border-gray-100 rounded-xl group shadow-sm transition-all hover:border-gray-200">
+    <div className="flex items-center gap-3 p-3 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-700 rounded-xl group shadow-sm transition-all hover:border-gray-200 dark:hover:border-slate-600">
       <input 
         type="color" 
         value={cat.color} 
@@ -38,7 +38,7 @@ const CategoryRow: React.FC<{
             onUpdate(cat.id, localName, cat.color);
           }
         }}
-        className="bg-transparent border-none text-sm font-bold w-full focus:ring-0 outline-none text-right"
+        className="bg-transparent border-none text-sm font-semibold w-full focus:ring-0 outline-none text-right dark:text-white"
         placeholder="שם קטגוריה..."
       />
       <button 
@@ -47,7 +47,7 @@ const CategoryRow: React.FC<{
           e.stopPropagation();
           onDelete(cat.id);
         }}
-        className="p-1.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all shrink-0"
+        className="p-1.5 text-gray-300 dark:text-slate-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all shrink-0"
         title="מחיקת קטגוריה"
       >
         <Lucide.Trash2 size={18} />
@@ -117,14 +117,14 @@ const CategoryEditor: React.FC<Props> = ({ categories }) => {
   return (
     <div className="space-y-6">
       {/* Add New Category Section */}
-      <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-4">
-        <label className="block text-sm font-bold text-slate-700">הוספת קטגוריה</label>
+      <div className="bg-gray-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-gray-100 dark:border-slate-700 space-y-4">
+        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">הוספת קטגוריה</label>
         <div className="flex flex-col gap-3">
           <input 
             value={newName} 
             onChange={e => setNewName(e.target.value)}
             placeholder="שם קטגוריה חדשה..."
-            className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none text-right"
+            className="w-full px-4 py-2 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none text-right dark:text-white"
           />
           <div className="flex justify-between items-center">
             <div className="flex gap-1.5">
@@ -133,7 +133,7 @@ const CategoryEditor: React.FC<Props> = ({ categories }) => {
                   key={c} 
                   type="button"
                   onClick={() => setNewColor(c)}
-                  className={`w-6 h-6 rounded-full border-2 transition-all ${newColor === c ? 'scale-110 border-slate-900 ring-2 ring-slate-200' : 'border-transparent hover:scale-105'}`}
+                  className={`w-6 h-6 rounded-full border-2 transition-all ${newColor === c ? 'scale-110 border-slate-900 dark:border-white ring-2 ring-slate-200 dark:ring-slate-700' : 'border-transparent hover:scale-105'}`}
                   style={{ backgroundColor: c }}
                 />
               ))}
@@ -152,10 +152,10 @@ const CategoryEditor: React.FC<Props> = ({ categories }) => {
 
       {/* Categories List */}
       <div className="space-y-2">
-        <label className="block text-sm font-bold text-slate-700 mb-2">קטגוריות קיימות</label>
+        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">קטגוריות קיימות</label>
         <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
           {categories.length === 0 ? (
-            <p className="text-center text-sm text-gray-400 py-8 italic bg-white/50 rounded-xl border border-dashed border-gray-200">
+            <p className="text-center text-sm text-gray-400 py-8 italic bg-white/50 dark:bg-slate-800/50 rounded-xl border border-dashed border-gray-200 dark:border-slate-700">
               אין קטגוריות עדיין.
             </p>
           ) : (

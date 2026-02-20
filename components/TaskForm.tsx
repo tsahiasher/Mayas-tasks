@@ -85,39 +85,39 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label className="block text-sm font-bold text-slate-700 mb-2 text-right">כותרת המשימה</label>
+        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 text-right">כותרת המשימה</label>
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="מה צריך לעשות?"
-          className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-right font-bold text-lg"
+          className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-right font-medium text-base dark:text-white"
           disabled={isSubmitting}
           autoFocus
         />
       </div>
 
       <div>
-        <label className="block text-sm font-bold text-slate-700 mb-2 text-right">תיאור (אופציונלי)</label>
+        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 text-right">תיאור (אופציונלי)</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="פרטים נוספים..."
           rows={3}
-          className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-right text-sm resize-none"
+          className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-right text-sm resize-none dark:text-white"
           disabled={isSubmitting}
         />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider text-right">קטגוריה</label>
+          <label className="block text-xs font-bold text-gray-500 dark:text-slate-400 mb-2 uppercase tracking-wider text-right">קטגוריה</label>
           {!isNewCategoryMode ? (
             <div className="flex gap-2">
               <select 
                 value={selectedCategoryId} 
                 onChange={(e) => setSelectedCategoryId(e.target.value)}
-                className="flex-grow px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 font-medium text-right"
+                className="flex-grow px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 font-medium text-right dark:text-white"
               >
                 <option value="default">ללא קטגוריה</option>
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
@@ -125,7 +125,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
               <button 
                 type="button" 
                 onClick={() => setIsNewCategoryMode(true)}
-                className="p-3 text-blue-600 hover:bg-blue-50 rounded-xl transition-colors border border-blue-100"
+                className="p-3 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-xl transition-colors border border-blue-100 dark:border-blue-900/50"
                 title="קטגוריה חדשה"
               >
                 <Lucide.PlusCircle size={24} />
@@ -138,13 +138,13 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
                 value={newCategoryName}
                 onChange={(e) => setNewCategoryName(e.target.value)}
                 placeholder="שם קטגוריה חדשה..."
-                className="flex-grow px-3 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 text-right"
+                className="flex-grow px-3 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 text-right dark:text-white"
                 autoFocus
               />
               <button 
                 type="button" 
                 onClick={() => setIsNewCategoryMode(false)}
-                className="p-3 text-gray-400 hover:bg-gray-50 rounded-xl transition-colors"
+                className="p-3 text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700 rounded-xl transition-colors"
                 title="ביטול"
               >
                 <Lucide.XCircle size={24} />
@@ -153,12 +153,12 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
           )}
         </div>
         <div>
-          <label className="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider text-right">דדליין</label>
+          <label className="block text-xs font-bold text-gray-500 dark:text-slate-400 mb-2 uppercase tracking-wider text-right">דדליין</label>
           <input 
             type="date" 
             value={deadline}
             onChange={(e) => setDeadline(e.target.value)}
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+            className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 font-medium dark:text-white"
           />
         </div>
       </div>
@@ -166,7 +166,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
       <button
         type="submit"
         disabled={isSubmitting || !title.trim() || (isNewCategoryMode && !newCategoryName.trim())}
-        className="w-full py-5 bg-blue-600 text-white font-black text-xl rounded-2xl hover:bg-blue-700 disabled:opacity-50 transition-all shadow-2xl shadow-blue-500/30 hover:-translate-y-1 active:translate-y-0"
+        className="w-full py-4 bg-blue-600 text-white font-bold text-lg rounded-2xl hover:bg-blue-700 disabled:opacity-50 transition-all shadow-xl shadow-blue-500/20 hover:-translate-y-0.5 active:translate-y-0"
       >
         {isSubmitting ? 'שומר...' : initialTask ? 'עדכן משימה' : 'צור משימה'}
       </button>

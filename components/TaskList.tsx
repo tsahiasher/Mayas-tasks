@@ -26,7 +26,25 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
     
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const tasksArray: Task[] = (querySnapshot as any).docs.map((d: any) => ({ id: d.id, ...d.data() } as Task));
-      tasksArray.sort((a, b) => (a.order || 0) - (b.order || 0));
+      
+      tasksArray.sort((a, b) => {
+        // If one has no deadline, put it at the end
+        if (!a.deadline && !b.deadline) return (a.order || 0) - (b.order || 0);
+        if (!a.deadline) return 1;
+        if (!b.deadline) return -1;
+        
+        // Compare dates
+        const dateA = new Date(a.deadline).getTime();
+        const dateB = new Date(b.deadline).getTime();
+        
+        if (dateA !== dateB) {
+          return dateA - dateB;
+        }
+        
+        // Secondary sort by order if dates are same
+        return (a.order || 0) - (b.order || 0);
+      });
+
       setTasks(tasksArray);
       setLoading(false);
     }, (error) => {
@@ -132,7 +150,7 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
           >
             <button
               onClick={() => toggleCategory(cat.id)}
-              className="flex items-center justify-between w-full p-4 bg-white/70 backdrop-blur-md border-r-4 shadow-sm hover:bg-white transition-all mb-2 rounded-2xl group"
+              className="flex items-center justify-between w-full p-4 bg-white/70 dark:bg-slate-800/70 backdrop-blur-md border-r-4 shadow-sm hover:bg-white dark:hover:bg-slate-800 transition-all mb-2 rounded-2xl group"
               style={{ borderRightColor: cat.color }}
             >
               <div className="flex items-center gap-3">
@@ -142,7 +160,7 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
                 >
                   {catTasks.length}
                 </span>
-                <span className="font-bold text-slate-800">{cat.name}</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200">{cat.name}</span>
               </div>
               <Lucide.ChevronDown size={18} className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
             </button>
@@ -159,22 +177,22 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
                       draggable={!showArchived}
                       onDragStart={() => onDragStart(task.id)}
                       onClick={() => toggleTaskExpansion(task.id)}
-                      className={`group flex flex-col p-4 bg-white/95 backdrop-blur-sm border border-gray-100 rounded-[1.5rem] shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all relative cursor-pointer overflow-hidden ${!showArchived ? '' : ''}`}
+                      className={`group flex flex-col p-4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border border-gray-100 dark:border-slate-700 rounded-[1.5rem] shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all relative cursor-pointer overflow-hidden ${!showArchived ? '' : ''}`}
                     >
                       {/* Status Line at Bottom */}
                       <div 
-                        className="absolute bottom-0 left-0 right-0 h-1.5" 
+                        className="absolute bottom-0 left-0 right-0 h-1" 
                         style={{ backgroundColor: statusColor }}
                       />
 
                       <div className="flex items-start justify-between gap-4 mb-1">
                         <div className="flex-grow">
-                          <p className={`font-bold text-lg leading-tight break-words ${task.isArchived ? 'line-through text-gray-400' : 'text-slate-800'}`}>
+                          <p className={`font-medium text-base leading-snug break-words ${task.isArchived ? 'line-through text-gray-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-100'}`}>
                             {task.title}
                           </p>
                           {task.deadline && (
-                            <p className="text-[11px] text-gray-400 mt-1 flex items-center gap-1.5 font-medium">
-                              <Lucide.Calendar size={12} className="text-blue-400" />
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 flex items-center gap-1.5 font-medium">
+                              <Lucide.Calendar size={13} className="text-blue-500 dark:text-blue-400" />
                               {new Date(task.deadline).toLocaleDateString('he-IL')}
                             </p>
                           )}
@@ -182,26 +200,26 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
                         <div className="flex items-center gap-3 shrink-0">
                           <Lucide.ChevronDown 
                             size={18} 
-                            className={`text-slate-300 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
+                            className={`text-slate-300 dark:text-slate-600 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
                           />
                           <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
                             <button 
                               onClick={(e) => handleEditClick(e, task)} 
-                              className="p-2 text-slate-400 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-all"
+                              className="p-2 text-slate-400 dark:text-slate-500 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-xl transition-all"
                               title="עריכת משימה"
                             >
                               <Lucide.Edit2 size={18} />
                             </button>
                             <button 
                               onClick={(e) => toggleArchive(e, task.id, task.isArchived)} 
-                              className="p-2 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all"
+                              className="p-2 text-slate-400 dark:text-slate-500 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-xl transition-all"
                               title={task.isArchived ? "שחזור משימה" : "סימון כבוצע"}
                             >
                               {task.isArchived ? <Lucide.RotateCcw size={18} /> : <Lucide.CheckCircle2 size={18} />}
                             </button>
                             <button 
                               onClick={(e) => deleteTask(e, task.id)} 
-                              className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                              className="p-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition-all"
                               title="מחיקה סופית"
                             >
                               <Lucide.Trash2 size={18} />
@@ -211,8 +229,8 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
                       </div>
                       
                       {isExpanded && (
-                        <div className="mt-3 pt-3 border-t border-gray-100 animate-in fade-in slide-in-from-top-1 duration-200 pb-2">
-                          <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap text-right">
+                        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-slate-700 animate-in fade-in slide-in-from-top-1 duration-200 pb-2">
+                          <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-wrap text-right">
                             {task.description || 'אין תיאור למשימה זו.'}
                           </p>
                         </div>
