@@ -1,0 +1,6 @@
+{
+  "name": "Maya's tasks",
+  "description": "אפליקציה חכמה לניהול משימות",
+  "deploymentServiceName": "Mayas-Tasks",
+  "requestFramePermissions": []
+}
