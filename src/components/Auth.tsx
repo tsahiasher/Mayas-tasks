@@ -9,7 +9,7 @@ import {
 import { Rocket, User as UserIcon, Key, Lock, AlertTriangle } from 'lucide-react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
-import { auth, db, functions } from '../services/firebase';
+import { auth, db, functions } from '@/services/firebase';
 
 interface Props {
   children: React.ReactNode;

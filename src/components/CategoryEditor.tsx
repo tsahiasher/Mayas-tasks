@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, updateDoc, doc, query, where, getDocs, writeBatch } from 'firebase/firestore';
 import { Trash2 } from 'lucide-react';
-import { db } from '../services/firebase';
-import { Category } from '../types';
+import { db } from '@/services/firebase';
+import { Category } from '@/types';
 
 interface Props {
   categories: Category[];

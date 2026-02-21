@@ -2,12 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { collection, onSnapshot, query, orderBy, doc, setDoc, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { Image, Settings, Archive, X, Plus } from 'lucide-react';
-import { db } from './services/firebase';
-import { Category, Task } from './types';
-import TaskForm from './components/TaskForm';
-import TaskList from './components/TaskList';
-import CategoryEditor from './components/CategoryEditor';
-import Auth from './components/Auth';
+import { db } from '@/services/firebase';
+import { Category, Task } from '@/types';
+import TaskForm from '@/components/TaskForm';
+import TaskList from '@/components/TaskList';
+import CategoryEditor from '@/components/CategoryEditor';
+import Auth from '@/components/Auth';
 
 const App: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);

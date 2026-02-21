@@ -13,6 +13,5 @@ export interface Task {
   categoryId: string;
   deadline: string;
   createdAt: number;
-  order: number;
   isArchived: boolean;
 }

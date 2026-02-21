@@ -68,8 +68,14 @@ exports.bootstrapAdmin = functions.https.onCall(async (data, context) => {
       // Mark as bootstrapped
       transaction.set(authDocRef, { 
         bootstrapped: true,
-        adminUid: user.uid,
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
+      // Store admin info in a protected document
+      transaction.set(db.collection('settings').doc('admin'), {
+        adminUid: user.uid,
+        adminEmail: user.email,
+        createdAt: admin.firestore.FieldValue.serverTimestamp()
       });
 
       return { success: true, uid: user.uid, email: user.email };

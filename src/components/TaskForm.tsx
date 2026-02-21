@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { Plus, X } from 'lucide-react';
-import { db } from '../services/firebase';
-import { Category, Task } from '../types';
+import { db } from '@/services/firebase';
+import { Category, Task } from '@/types';
 
 interface Props {
   onSuccess?: () => void;
@@ -59,7 +59,6 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
         categoryId: categoryIdToUse || 'default',
         deadline,
         isArchived: initialTask?.isArchived || false,
-        order: initialTask?.order || Date.now(),
         updatedAt: Date.now(),
       };
 

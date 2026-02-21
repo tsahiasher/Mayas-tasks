@@ -2,8 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { collection, onSnapshot, query, deleteDoc, doc, updateDoc, where } from 'firebase/firestore';
 import { ChevronDown, Calendar, Pencil, Check, RotateCcw, Trash2 } from 'lucide-react';
-import { db } from '../services/firebase';
-import { Task, Category } from '../types';
+import { db } from '@/services/firebase';
+import { Task, Category } from '@/types';
+import { parseLocalDate, formatLocalDate } from '@/utils/dateUtils';
 
 interface Props {
   categories: Category[];
@@ -16,7 +17,6 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
   const [loading, setLoading] = useState(true);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
-  const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     const q = query(
@@ -29,20 +29,20 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
       
       tasksArray.sort((a, b) => {
         // If one has no deadline, put it at the end
-        if (!a.deadline && !b.deadline) return (a.order || 0) - (b.order || 0);
+        if (!a.deadline && !b.deadline) return (a.createdAt || 0) - (b.createdAt || 0);
         if (!a.deadline) return 1;
         if (!b.deadline) return -1;
         
         // Compare dates
-        const dateA = new Date(a.deadline).getTime();
-        const dateB = new Date(b.deadline).getTime();
+        const dateA = parseLocalDate(a.deadline)?.getTime() || 0;
+        const dateB = parseLocalDate(b.deadline)?.getTime() || 0;
         
         if (dateA !== dateB) {
           return dateA - dateB;
         }
         
-        // Secondary sort by order if dates are same
-        return (a.order || 0) - (b.order || 0);
+        // Secondary sort by createdAt if dates are same
+        return (a.createdAt || 0) - (b.createdAt || 0);
       });
 
       setTasks(tasksArray);
@@ -83,25 +83,12 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
     setExpandedTasks(newSet);
   };
 
-  const onDragStart = (id: string) => setDraggedTaskId(id);
-  const onDragOver = (e: React.DragEvent) => e.preventDefault();
-  
-  const onDrop = async (categoryId: string, targetOrderId: number) => {
-    if (!draggedTaskId) return;
-    const taskDoc = doc(db, 'tasks', draggedTaskId);
-    await updateDoc(taskDoc, { 
-      categoryId: categoryId,
-      order: targetOrderId - 1
-    });
-    setDraggedTaskId(null);
-  };
-
   const getTaskStatusColor = (deadline: string) => {
-    if (!deadline) return '#10b981'; // Green (No due date)
+    const dueDate = parseLocalDate(deadline);
+    if (!dueDate) return '#10b981'; // Green (No due date)
     
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const dueDate = new Date(deadline);
     dueDate.setHours(0, 0, 0, 0);
     
     const diffTime = dueDate.getTime() - today.getTime();
@@ -143,11 +130,7 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
         const isOpen = expandedCategories.has(cat.id);
         
         return (
-          <div key={cat.id} 
-            onDragOver={onDragOver} 
-            onDrop={() => onDrop(cat.id, Date.now())}
-            className="overflow-hidden"
-          >
+          <div key={cat.id} className="overflow-hidden">
             <button
               onClick={() => toggleCategory(cat.id)}
               className="flex items-center justify-between w-full p-4 bg-white/70 dark:bg-slate-800/70 backdrop-blur-md border-r-4 shadow-sm hover:bg-white dark:hover:bg-slate-800 transition-all mb-2 rounded-2xl group"
@@ -176,8 +159,6 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
                   return (
                     <li
                       key={task.id}
-                      draggable={!showArchived}
-                      onDragStart={() => onDragStart(task.id)}
                       onClick={() => toggleTaskExpansion(task.id)}
                       className={`group flex flex-col p-4 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border border-gray-100 dark:border-slate-700 rounded-[1.5rem] shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all relative cursor-pointer overflow-hidden ${!showArchived ? '' : ''}`}
                     >
@@ -195,7 +176,7 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
                           {task.deadline && (
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 flex items-center gap-1.5 font-medium">
                               <Calendar size={14} className="text-blue-500 dark:text-blue-400" />
-                              {new Date(task.deadline).toLocaleDateString('he-IL')}
+                              {formatLocalDate(task.deadline)}
                             </p>
                           )}
                         </div>
