@@ -184,7 +184,7 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
                           <span className={`text-slate-300 dark:text-slate-600 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
                             <ChevronDown size={18} />
                           </span>
-                          <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
+                          <div className={`flex gap-1.5 transition-all ${isExpanded ? 'opacity-100' : 'opacity-100 lg:opacity-0 lg:group-hover:opacity-100'}`}>
                             <button 
                               onClick={(e) => handleEditClick(e, task)} 
                               className="p-2 text-slate-400 dark:text-slate-500 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-xl transition-all"
