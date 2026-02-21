@@ -1,13 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { collection, onSnapshot, query, orderBy, doc, setDoc, where, getDocs, deleteDoc } from 'firebase/firestore';
+import { Image, Settings, Archive, X, Plus } from 'lucide-react';
 import { db } from './services/firebase';
 import { Category, Task } from './types';
 import TaskForm from './components/TaskForm';
 import TaskList from './components/TaskList';
 import CategoryEditor from './components/CategoryEditor';
 import Auth from './components/Auth';
-import * as Lucide from 'lucide-react';
 
 const App: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -22,13 +22,13 @@ const App: React.FC = () => {
     // Categories listener
     const q = query(collection(db, 'categories'), orderBy('order', 'asc'));
     const unsubscribeCats = onSnapshot(q, (snapshot) => {
-      setCategories((snapshot as any).docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as Category)));
+      setCategories(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Category)));
     });
 
     // Theme/Background listener for cross-device persistence
     const unsubscribeTheme = onSnapshot(doc(db, 'settings', 'theme'), (docSnap) => {
       if (docSnap.exists()) {
-        const data = docSnap.data() as any;
+        const data = docSnap.data();
         const url = data?.bgImage;
         if (url !== undefined) {
           setBgImage(url);
@@ -70,7 +70,6 @@ const App: React.FC = () => {
         
         if (deletePromises.length > 0) {
           await Promise.all(deletePromises);
-          console.log(`Cleaned up ${deletePromises.length} old archived tasks.`);
         }
       } catch (err) {
         console.error("Error during auto-cleanup:", err);
@@ -127,14 +126,14 @@ const App: React.FC = () => {
                 }`}
                 title="שנה רקע"
               >
-                <Lucide.Image size={20} />
+                <Image size={20} />
               </button>
               <button 
                 onClick={() => setShowCategoryModal(true)}
                 className="p-2.5 bg-white/80 dark:bg-slate-700/80 rounded-xl shadow-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all"
                 title="ניהול קטגוריות"
               >
-                <Lucide.Settings size={20} />
+                <Settings size={20} />
               </button>
             </div>
 
@@ -151,8 +150,8 @@ const App: React.FC = () => {
                   : 'bg-white/80 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-slate-600'
                 }`}
               >
-                <Lucide.Archive size={18} />
-                {showArchived ? 'ארכיון' : 'ארכיון'}
+                <Archive size={18} />
+                {showArchived ? 'משימות פעילות' : 'ארכיון'}
               </button>
             </div>
           </div>
@@ -163,7 +162,7 @@ const App: React.FC = () => {
                  <div className="flex justify-between items-center mb-1">
                    <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-200">הגדרת רקע מותאם אישית</h3>
                    <button onClick={() => setShowBgInput(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
-                      <Lucide.X size={16} />
+                      <X size={18} />
                    </button>
                  </div>
                  
@@ -218,7 +217,7 @@ const App: React.FC = () => {
                     {editingTask ? 'עריכת משימה' : 'הוספת משימה חדשה'}
                   </h2>
                   <button onClick={closeTaskModal} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-full text-slate-400">
-                    <Lucide.X size={20} />
+                    <X size={20} />
                   </button>
                 </div>
                 <div className="p-6 overflow-y-auto custom-scrollbar">
@@ -239,7 +238,7 @@ const App: React.FC = () => {
                 <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-slate-700 shrink-0">
                   <h2 className="text-lg font-bold text-slate-800 dark:text-white">ניהול קטגוריות</h2>
                   <button onClick={() => setShowCategoryModal(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-full text-slate-400">
-                    <Lucide.X size={20} />
+                    <X size={20} />
                   </button>
                 </div>
                 <div className="p-6 overflow-y-auto custom-scrollbar">
@@ -255,7 +254,7 @@ const App: React.FC = () => {
               onClick={() => setShowTaskModal(true)}
               className="fixed bottom-8 left-8 w-16 h-16 bg-blue-600 text-white rounded-full shadow-2xl shadow-blue-500/40 hover:bg-blue-700 hover:scale-110 active:scale-95 transition-all flex items-center justify-center z-40 group"
             >
-              <Lucide.Plus size={32} className="group-hover:rotate-90 transition-transform duration-300" />
+              <Plus size={32} />
             </button>
           )}
         </div>

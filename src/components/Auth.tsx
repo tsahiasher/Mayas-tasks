@@ -3,10 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { 
   onAuthStateChanged, 
   signInWithEmailAndPassword, 
-  signOut,
   User,
   getIdTokenResult
 } from 'firebase/auth';
+import { Rocket, User as UserIcon, Key, Lock, AlertTriangle } from 'lucide-react';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { auth, db, functions } from '../services/firebase';
@@ -38,15 +38,9 @@ const Auth: React.FC<Props> = ({ children }) => {
       setLoading(true);
       if (firebaseUser) {
         try {
-          // Force refresh token to get latest custom claims
           const tokenResult = await getIdTokenResult(firebaseUser, true);
-          if (tokenResult.claims.admin === true) {
-            setUser(firebaseUser);
-            setIsAdmin(true);
-          } else {
-            setUser(firebaseUser);
-            setIsAdmin(false);
-          }
+          setIsAdmin(tokenResult.claims.admin === true);
+          setUser(firebaseUser);
         } catch (err) {
           console.error("Error checking claims:", err);
           setIsAdmin(false);
@@ -72,21 +66,20 @@ const Auth: React.FC<Props> = ({ children }) => {
       const bootstrapAdmin = httpsCallable(functions, 'bootstrapAdmin');
       await bootstrapAdmin({ username, password });
       
-      // After successful bootstrap, sign in
       const email = `${username}@local-admin.invalid`;
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       
-      // Force token refresh to get the admin claim
       const tokenResult = await getIdTokenResult(userCredential.user, true);
       if (tokenResult.claims.admin === true) {
         setIsAdmin(true);
       } else {
         setError('החשבון נוצר אך הרשאות המנהל טרם הופעלו. נסה להתחבר שוב.');
       }
-    } catch (err: any) {
-      console.error("Bootstrap error details:", err);
+    } catch (err) {
+      const error = err as { message?: string };
+      console.error("Bootstrap error details:", error);
       // Extract the message from Firebase Functions error
-      const errorMessage = err.message || 'שגיאה בתהליך ההגדרה הראשונית';
+      const errorMessage = error.message || 'שגיאה בתהליך ההגדרה הראשונית';
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -108,11 +101,12 @@ const Auth: React.FC<Props> = ({ children }) => {
       } else {
         setIsAdmin(false);
       }
-    } catch (err: any) {
-      console.error("Auth error:", err);
-      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+    } catch (err) {
+      const error = err as { code?: string };
+      console.error("Auth error:", error);
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
         setError('שם משתמש או סיסמה שגויים');
-      } else if (err.code === 'auth/too-many-requests') {
+      } else if (error.code === 'auth/too-many-requests') {
         setError('יותר מדי ניסיונות כושלים. נסה שוב מאוחר יותר.');
       } else {
         setError('שגיאה בתהליך האימות');
@@ -121,8 +115,6 @@ const Auth: React.FC<Props> = ({ children }) => {
       setLoading(false);
     }
   };
-
-  const handleSignOut = () => signOut(auth);
 
   if (loading || isBootstrapped === null) {
     return (
@@ -138,8 +130,8 @@ const Auth: React.FC<Props> = ({ children }) => {
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-4" dir="rtl">
         <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8 border border-white/50 dark:border-slate-700/50">
           <div className="flex flex-col items-center mb-8">
-            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-3xl mb-4">
-              🚀
+            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600 mb-4">
+              <Rocket size={32} />
             </div>
             <h1 className="text-2xl font-bold text-slate-800 dark:text-white">הגדרת מערכת ראשונית</h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm mt-2 text-center">
@@ -151,7 +143,9 @@ const Auth: React.FC<Props> = ({ children }) => {
             <div>
               <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 mr-1">שם משתמש מנהל</label>
               <div className="relative">
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">👤</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                  <UserIcon size={18} />
+                </span>
                 <input 
                   type="text" 
                   value={username}
@@ -166,7 +160,9 @@ const Auth: React.FC<Props> = ({ children }) => {
             <div>
               <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 mr-1">סיסמה</label>
               <div className="relative">
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">🔑</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                  <Key size={18} />
+                </span>
                 <input 
                   type="password" 
                   value={password}
@@ -199,15 +195,6 @@ const Auth: React.FC<Props> = ({ children }) => {
   if (user && isAdmin) {
     return (
       <>
-        <div className="fixed top-4 left-4 z-[60]">
-          <button 
-            onClick={handleSignOut}
-            className="p-2 bg-white/80 dark:bg-slate-800/80 rounded-xl shadow-sm text-slate-600 dark:text-slate-300 hover:text-red-500 transition-all border border-white/30 dark:border-slate-700/30"
-            title="התנתק"
-          >
-            🚪
-          </button>
-        </div>
         {children}
       </>
     );
@@ -217,16 +204,12 @@ const Auth: React.FC<Props> = ({ children }) => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-4" dir="rtl">
         <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8 border border-white/50 dark:border-slate-700/50 text-center">
-          <div className="text-5xl mb-4">⚠️</div>
+          <div className="flex justify-center mb-4 text-amber-500">
+            <AlertTriangle size={48} />
+          </div>
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">גישה חסומה</h1>
           <p className="text-slate-500 dark:text-slate-400 mb-2">מחובר כ: <span className="font-medium">{user.displayName || user.email}</span></p>
           <p className="text-slate-500 dark:text-slate-400 mb-6">אין לך הרשאות מנהל לגישה למערכת זו.</p>
-          <button 
-            onClick={handleSignOut}
-            className="w-full py-4 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white font-bold rounded-2xl hover:bg-slate-300 dark:hover:bg-slate-600 transition-all"
-          >
-            התנתק ונסה חשבון אחר
-          </button>
         </div>
       </div>
     );
@@ -236,8 +219,8 @@ const Auth: React.FC<Props> = ({ children }) => {
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-4" dir="rtl">
       <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8 border border-white/50 dark:border-slate-700/50">
         <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-3xl mb-4">
-            🔒
+          <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600 mb-4">
+            <Lock size={32} />
           </div>
           <h1 className="text-2xl font-bold text-slate-800 dark:text-white">התחברות למערכת</h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm mt-2 text-center">
@@ -249,7 +232,9 @@ const Auth: React.FC<Props> = ({ children }) => {
           <div>
             <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 mr-1">שם משתמש</label>
             <div className="relative">
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">👤</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                <UserIcon size={18} />
+              </span>
               <input 
                 type="text" 
                 value={username}
@@ -264,7 +249,9 @@ const Auth: React.FC<Props> = ({ children }) => {
           <div>
             <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 mr-1">סיסמה</label>
             <div className="relative">
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">🔑</span>
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                <Key size={18} />
+              </span>
               <input 
                 type="password" 
                 value={password}

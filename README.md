@@ -17,4 +17,3 @@
 - **React 19** & **TypeScript**
 - **Tailwind CSS** לעיצוב מודרני ומהיר
 - **Firebase Firestore** למסד נתונים בזמן אמת
-- **Lucide React** לאייקונים מעוצבים

@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { collection, onSnapshot, query, deleteDoc, doc, updateDoc, where } from 'firebase/firestore';
+import { ChevronDown, Calendar, Pencil, Check, RotateCcw, Trash2 } from 'lucide-react';
 import { db } from '../services/firebase';
 import { Task, Category } from '../types';
 
@@ -24,7 +25,7 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
     );
     
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const tasksArray: Task[] = (querySnapshot as any).docs.map((d: any) => ({ id: d.id, ...d.data() } as Task));
+      const tasksArray: Task[] = querySnapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Task));
       
       tasksArray.sort((a, b) => {
         // If one has no deadline, put it at the end
@@ -161,7 +162,9 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
                 </span>
                 <span className="font-semibold text-slate-800 dark:text-slate-200">{cat.name}</span>
               </div>
-              <span className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}>🔽</span>
+              <span className={`text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}>
+                <ChevronDown size={18} />
+              </span>
             </button>
 
             {isOpen && (
@@ -191,14 +194,14 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
                           </p>
                           {task.deadline && (
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5 flex items-center gap-1.5 font-medium">
-                              <span className="text-blue-500 dark:text-blue-400">📅</span>
+                              <Calendar size={14} className="text-blue-500 dark:text-blue-400" />
                               {new Date(task.deadline).toLocaleDateString('he-IL')}
                             </p>
                           )}
                         </div>
                         <div className="flex items-center gap-3 shrink-0">
                           <span className={`text-slate-300 dark:text-slate-600 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
-                            🔽
+                            <ChevronDown size={18} />
                           </span>
                           <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all">
                             <button 
@@ -206,21 +209,21 @@ const TaskList: React.FC<Props> = ({ categories, showArchived, onEditTask }) => 
                               className="p-2 text-slate-400 dark:text-slate-500 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-xl transition-all"
                               title="עריכת משימה"
                             >
-                              ✏️
+                              <Pencil size={16} />
                             </button>
                             <button 
                               onClick={(e) => toggleArchive(e, task.id, task.isArchived)} 
                               className="p-2 text-slate-400 dark:text-slate-500 hover:text-emerald-500 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 rounded-xl transition-all"
                               title={task.isArchived ? "שחזור משימה" : "סימון כבוצע"}
                             >
-                              {task.isArchived ? '🔄' : '✅'}
+                              {task.isArchived ? <RotateCcw size={16} /> : <Check size={16} />}
                             </button>
                             <button 
                               onClick={(e) => deleteTask(e, task.id)} 
                               className="p-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-xl transition-all"
                               title="מחיקה סופית"
                             >
-                              🗑️
+                              <Trash2 size={16} />
                             </button>
                           </div>
                         </div>

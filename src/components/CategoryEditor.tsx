@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
-import { collection, addDoc, updateDoc, deleteDoc, doc, query, where, getDocs, writeBatch } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, query, where, getDocs, writeBatch } from 'firebase/firestore';
+import { Trash2 } from 'lucide-react';
 import { db } from '../services/firebase';
 import { Category } from '../types';
 
@@ -49,7 +50,7 @@ const CategoryRow: React.FC<{
         className="p-1.5 text-gray-300 dark:text-slate-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all shrink-0"
         title="מחיקת קטגוריה"
       >
-        🗑️
+        <Trash2 size={16} />
       </button>
     </div>
   );

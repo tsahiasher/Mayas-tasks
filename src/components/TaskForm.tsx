@@ -1,10 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { collection, addDoc, updateDoc, doc, query, where, getDocs } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
+import { Plus, X } from 'lucide-react';
 import { db } from '../services/firebase';
 import { Category, Task } from '../types';
-
-const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#64748b', '#ec4899', '#0ea5e9', '#d946ef'];
 
 interface Props {
   onSuccess?: () => void;
@@ -127,7 +126,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
                 className="p-3 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-xl transition-colors border border-blue-100 dark:border-blue-900/50"
                 title="קטגוריה חדשה"
               >
-                ➕
+                <Plus size={18} />
               </button>
             </div>
           ) : (
@@ -146,7 +145,7 @@ const TaskForm: React.FC<Props> = ({ onSuccess, initialTask, categories }) => {
                 className="p-3 text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700 rounded-xl transition-colors"
                 title="ביטול"
               >
-                ❌
+                <X size={18} />
               </button>
             </div>
           )}

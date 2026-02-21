@@ -1,14 +1,19 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { getFunctions } from 'firebase/functions';
 
 const firebaseConfig = {
-  apiKey: process.env.API_KEY,
-  authDomain: "maya-s-task.firebaseapp.com",
-  projectId: "maya-s-task",
-  storageBucket: "maya-s-task.firebasestorage.app",
-  messagingSenderId: "350568568050",
-  appId: "1:350568568050:web:88a5ce30e500e228ecac6b"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
+export const auth = getAuth(app);
+export const functions = getFunctions(app, 'us-central1');
+
