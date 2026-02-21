@@ -2,7 +2,7 @@
 
 **המשימות של מאיה** היא אפליקציה חכמה, מעוצבת ואינטואיטיבית לניהול משימות אישיות. האפליקציה נבנתה בדגש על חווית משתמש נקייה (Minimalist UX) ותמיכה מלאה בעברית (RTL).
 
-![צילום מסך של האפליקציה](https://drive.google.com/file/d/1DOQtWTTBKzdDUrYPxlOHBRwAKynLPKia/view)
+![צילום מסך של האפליקציה](https://lh3.googleusercontent.com/d/1DOQtWTTBKzdDUrYPxlOHBRwAKynLPKia)
 
 ## ✨ תכונות עיקריות
 
